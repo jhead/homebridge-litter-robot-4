@@ -1,10 +1,17 @@
-# Dependencies
-node_modules/
-package-lock.json
+# Source files
+src/
+*.ts
+*.tsx
+*.js.map
 
-# Build output
-dist/
-build/
+# Development files
+.git/
+.gitignore
+.eslintrc.json
+.prettierrc
+tsconfig.json
+jest.config.js
+coverage/
 
 # IDE files
 .idea/
@@ -25,4 +32,4 @@ yarn-error.log*
 
 # OS files
 .DS_Store
-Thumbs.db
+Thumbs.db 

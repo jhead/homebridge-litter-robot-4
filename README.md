@@ -1,44 +1,67 @@
-# homebridge-litter-robot-connect
+# Homebridge Litter-Robot Connect
 
-[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+This is a [Homebridge](https://github.com/nfarina/homebridge) plugin that allows you to control your Litter-Robot 3 Connect from HomeKit.
 
-Litter-Robot Connect [Homebridge](https://github.com/nfarina/homebridge) Plugin
+## Features
 
-Integrates your Litter-Robot device with HomeKit. Enables monitoring of waste level, occupancy, current cycling status, as well as ability to turn on/off the nightlight, run a manual cycle, and reset the waste level gauge.
+- Control your Litter-Robot 3 Connect from HomeKit
+- Monitor waste drawer level
+- Control night light
+- Monitor cat presence
+- Monitor waste drawer status
+- Reset waste drawer level gauge
 
-Consider using [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x) to manage the installation and configuration steps.
+## Installation
 
-# Installation
+1. Install Homebridge using `npm install -g homebridge`
+2. Install this plugin using `npm install -g homebridge-litter-robot-connect`
+3. Update your Homebridge configuration file with your Litter-Robot credentials
 
-1. Install homebridge using: `npm install -g homebridge`
-2. Install this plug-in using: `npm install -g homebridge-litter-robot-connect`
-3. Update your configuration file. See example `config.json` snippet below.
+## Configuration
 
-# Configuration
+Add the following to your Homebridge config.json:
 
-Configuration sample (edit `~/.homebridge/config.json`):
-
-```
-"platforms": [
+```json
+{
+  "platforms": [
     {
-        "platform":  "LitterRobotPlatform"
-        "username":  "YOUR-LITTER-ROBOT-EMAIL",
-        "password":  "YOUR-LITTER-ROBOT-PASSWORD",
+      "platform": "LitterRobotPlatform",
+      "username": "your-email@example.com",
+      "password": "your-password",
+      "hideRobotAccessory": false,
+      "hideNightlightAccessory": false,
+      "hideOccupancyAccessory": false,
+      "hideTrayAccessory": true
     }
-]
+  ]
+}
 ```
 
-Your username and password are not stored, they are only used to generate an auth token which is used for all subsequent requests. This auth token is not stored either, and expires every hour (Litter-Robot's configuration). A refresh token is used to request new auth tokens upon expiry.
+### Configuration Options
 
-Optional fields:
+- `username`: Your Litter-Robot account email
+- `password`: Your Litter-Robot account password
+- `hideRobotAccessory`: Hide the main robot accessory (default: false)
+- `hideNightlightAccessory`: Hide the nightlight accessory (default: false)
+- `hideOccupancyAccessory`: Hide the occupancy sensor accessory (default: false)
+- `hideTrayAccessory`: Hide the waste drawer accessory (default: true)
 
-* `"hideRobotAccessory"`: `"true/false"` - Optionally hides the main Litter-Robot accessory controls
-* `"hideNightlightAccessory"`: `"true/false"` - Optionally hides the Litter-Robot nightlight switch
-* `"hideOccupancyAccessory"`: `"true/false"` - Optionally hides the Litter-Robot occupancy sensor
-* `"hideTrayAccessory"`: `"true/false"` - **NEW** Optionally hides the Litter-Robot tray full sensor (defaults to true)
+## Development
 
-# How It Works
-With all accessories enabled, this plugin will query the Litter-Robot API and generate the following accessories for your usage:
-* **Robot/Filter Accessory**: This will appear as an Air Purifier accessory with 2 switches, a Manual/Auto toggle, and a filter level. The main power switch controls power to your device (this does not take the Litter-Robot offline, so you can still control it after "turning off"). The toggle switch will automatically "turn on" when your waste level goes above Empty, allowing you to turn it back off and send a reset request to Litter-Robot when you empty the tray. The accessory will always be in Auto mode, and switching to Manual will trigger a manual cycle, at which point it will return back to Auto. The filter life/level counts down opposite of the waste level (e.g. 25% full = 75% filter life).
-* **Nightlight Accessory**: This will appear as a standard Light accessory, allowing you to toggle the nightlight in the Litter-Robot.
-* **Occupancy Accessory**: This will appear as an Occupancy sensor, which will be triggered when your pet enters the Litter-Robot and triggers a timing event. Depending on your settings, this will be cleared after the timeout is reached and your Litter-Robot runs an automatic cycle after your pet exits.
+This plugin is written in TypeScript and uses modern Node.js features. To contribute:
+
+1. Clone this repository
+2. Install dependencies: `npm install`
+3. Build the project: `npm run build`
+4. Run tests: `npm test`
+5. Lint the code: `npm run lint`
+6. Format the code: `npm run format`
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Homebridge](https://github.com/nfarina/homebridge) for the HomeKit integration framework
+- [Litter-Robot](https://www.litter-robot.com/) for the awesome product

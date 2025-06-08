@@ -49,7 +49,7 @@
                 "title": "Polling Frequency",
                 "type": "integer",
                 "description": "Adjusts how frequently (in seconds) the platform will poll the Litter-Robot API for current status.",
-                "default": 5
+                "default": 300
             }
         }
     },

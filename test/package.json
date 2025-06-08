@@ -1,0 +1,16 @@
+{
+  "name": "litter-robot-connect-test",
+  "version": "1.0.0",
+  "description": "Integration tests for litter-robot-connect",
+  "scripts": {
+    "test": "ts-node auth-test.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.0.0",
+    "axios": "^1.6.0",
+    "homebridge": "^1.6.0",
+    "jsonwebtoken": "^9.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
