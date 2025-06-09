@@ -8,10 +8,9 @@ import {
 } from 'homebridge';
 import { LitterRobotConnect } from './litter-robot-connect';
 import { LitterRobotDevice } from './device';
-import { LitterRobot4 } from './types';
 
 export class LitterRobotPlatform implements DynamicPlatformPlugin {
-  public static readonly PLUGIN_NAME = '@jhead/homebridge-litter-robot-connect';
+  public static readonly PLUGIN_NAME = '@jhead/homebridge-litter-robot-4';
   public static readonly PLATFORM_NAME = 'LitterRobotPlatform';
 
   public readonly api: API;
