@@ -1,11 +1,11 @@
 {
   "name": "@jhead/homebridge-litter-robot-4",
-  "version": "0.1.0",
-  "description": "Litter-Robot Connect Homebridge Plugin",
+  "version": "0.1.1",
+  "description": "Whisker Litter Robot 4 Homebridge Plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "homebridge-litter-robot-connect": "dist/index.js"
+    "homebridge-litter-robot-4": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -20,19 +20,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ryanleesmith/homebridge-litter-robot-connect.git"
+    "url": "git://github.com/jhead/homebridge-litter-robot-4.git"
   },
   "keywords": [
     "homebridge-plugin",
     "homebridge",
     "litter-robot"
   ],
-  "author": "Ryan Smith",
+  "author": "Justin Head",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ryanleesmith/homebridge-litter-robot-connect/issues"
+    "url": "https://github.com/jhead/homebridge-litter-robot-4/issues"
   },
-  "homepage": "https://github.com/ryanleesmith/homebridge-litter-robot-connect#readme",
+  "homepage": "https://github.com/jhead/homebridge-litter-robot-4#readme",
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.826.0",
     "axios": "^1.6.7",
