@@ -1,29 +1,525 @@
-# Whisker App Reverse Engineering
+# Litter Robot 4 API Documentation
 
-## LR4 GraphQL Mutations
+## Introduction
 
+Most information documented here was extracted from the Whisker iOS app on the Apple App Store or intercepted via mitmproxy. The app appears to be Flutter/Dart-based and uses AWS Amplify.
+
+## Authentication
+
+The API uses AWS Cognito for authentication. The authentication flow is straightforward:
+
+1. Authenticate with username/password via Cognito USER_PASSWORD_AUTH flow
+2. Use the returned ID token in subsequent API requests
+
+## API Endpoints
+
+`https://lr4.iothings.site/graphql`
+
+## GraphQL Mutations
+
+### Robot Control Commands
+
+#### Send Command
+
+```graphql
+mutation SendLR4Command(
+  $serial: String!
+  $command: String!
+  $value: String
+  $commandSource: String
+) {
+  sendLitterRobot4Command(
+    input: { serial: $serial, command: $command, value: $value, commandSource: $commandSource }
+  )
+}
 ```
-102166 0x0101c7e0 0x0101c7e0 151  152  1.__TEXT.__const ascii       mutation RegisterLR4($value: LR4RegisterRobotInput!) {\n      registerLitterRobot4(input: $value) {\n        body\n        statusCode\n      }\n    }\n
-104843 0x01044b00 0x01044b00 140  141  1.__TEXT.__const ascii     mutation toggleHopper($serial: String!, $isRemoved: Boolean!) {\n  toggleHopper(serial: $serial, isRemoved: $isRemoved) {\n    success\n  }\n}
-104929 0x010461a0 0x010461a0 249  250  1.__TEXT.__const ascii   mutation SetUserFunctionalSettings($userId: String, $autoUpdateFeature: FeatureFlagOptions) {\n  setUserFunctionalSettings(userFunctionalSettingsInput: {userId: $userId, autoUpdateFeature: $autoUpdateFeature}) {\n    autoUpdateFeature\n    userId\n  }\n}
-105878 0x01053920 0x01053920 1764 1765 1.__TEXT.__const ascii       mutation updateUserSettings ($value: UpdateUserSettingsInput!) {\n    updateUserSettings (input: $value) {\n        user {\n            useMetric\n            settings {\n                LR4Notifications {\n                    all_notifications\n                    CCC_notifications\n                    CSI_notifications\n                    DFI_notifications\n                    fault_notifications\n                    CSF_notifications\n                    PD_notifications\n                    OTF_notifications\n                    DHF_notifications\n                    BR_notifications\n                    MTF_notifications\n                    MID_notifications\n                    general_notifications\n                    offline_notifications\n                    LF_notifications\n                    LL_notifications\n                    HPE_notifications\n                }\n                LR3Notifications {\n                  BR_notifications\n                  CCC_notifications\n                  CSF_notifications\n                  CSI_notifications\n                  DFI_notifications\n                  DHF_notifications\n                  OTF_notifications\n                  PD_notifications\n                  all_notifications\n                  fault_notifications\n                  general_notifications\n                  offline_notifications\n                }\n                FR1Notifications {\n                  chuteFullExt\n                  defectiveSensor\n                  dispenseFailed\n                  levelLow\n                  mealDispensed\n                  motorFault\n                  snackDispensed\n                  snackRejected\n                  all\n                }\n            }\n        }\n        statusCode\n        body\n    }\n  }\n
-115127 0x01108420 0x01108420 8    9    1.__TEXT.__const ascii   mutation
-116294 0x011181b0 0x011181b0 166  167  1.__TEXT.__const ascii       mutation UpdateFeeder($id: Int!, $name: String!) {\n      update_feeder_unit(where: {id: {_eq: $id}}, _set: {name: $name}) {\n        affected_rows\n      }\n    }\n
-119221 0x011430b0 0x011430b0 113  114  1.__TEXT.__const ascii       mutation UpdatePet($value: UpdatePetInput!) {\n      updatePet(input: $value) {\n        petId\n      }\n    }\n
-119846 0x0114c4b0 0x0114c4b0 375  376  1.__TEXT.__const ascii        mutation createUser($email: AWSEmail!, $firstName: String!, $lastName: String!, $password: String!, $extensionAttributes: ExtensionAttributes) {\n      createUser(input: {email: $email, firstName: $firstName, lastName: $lastName, password: $password, extensionAttributes: $extensionAttributes}) {\n        id\n        firstName\n        lastName\n        email\n      }\n    }\n
-124475 0x011952e0 0x011952e0 197  198  1.__TEXT.__const ascii       mutation ActivateWPlusSubscription($input: ActivateWPlusSubscriptionInput!) {\n      activateWPlusSubscription(input: $input) {\n        success\n        result_code\n        message\n      }\n    }\n
-127819 0x011c7780 0x011c7780 152  153  1.__TEXT.__const ascii       mutation litterRobot4StateUpdate($value: LR4UpdateLitterRobotInput!) {\n      updateLitterRobot4(input: $value) {\n       surfaceType\n      }\n    }\n
-128285 0x011cee00 0x011cee00 2399 2400 1.__TEXT.__const ascii        mutation resetScoopsSavedCounter($serial: String!) {\n      resetScoopsSavedCounter(serial: $serial) {\n     userId\n    robotCount\n    robots {\n      unitId\n      name\n      serial\n      userId\n      espFirmware\n      picFirmwareVersion\n      picFirmwareVersionHex\n      laserBoardFirmwareVersion\n      laserBoardFirmwareVersionHex\n      wifiRssi\n      unitPowerType\n      catWeight\n      unitTimezone\n      unitTime\n      cleanCycleWaitTime\n      isKeypadLockout\n      nightLightMode\n      nightLightBrightness\n      isPanelSleepMode\n      panelBrightnessHigh\n      panelBrightnessLow\n      smartWeightEnabled\n      panelSleepTime\n      panelWakeTime\n      displayCode\n      weekdaySleepModeEnabled {\n        Sunday {\n          sleepTime\n          wakeTime\n          isEnabled\n        }\n        Monday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n        Tuesday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n        Wednesday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n        Thursday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n        Friday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n        Saturday {\n              sleepTime\n              wakeTime\n              isEnabled\n            }\n      }\n      litterLevelPercentage\n      litterLevelState\n      unitPowerStatus\n      sleepStatus\n      robotStatus\n      globeMotorFaultStatus\n      pinchStatus\n      catDetect\n      isBonnetRemoved\n      isNightLightLEDOn\n      odometerPowerCycles\n      odometerCleanCycles\n      odometerEmptyCycles\n      odometerFilterCycles\n      isDFIResetPending\n      DFINumberOfCycles\n      DFILevelPercent\n      isDFIFull\n      DFIFullCounter\n      DFITriggerCount\n      litterLevel\n      DFILevelMM\n      isCatDetectPending\n      globeMotorRetractFaultStatus\n      robotCycleStatus\n      robotCycleState\n      weightSensor\n      isOnline\n      isOnboarded\n      isProvisioned\n      isDebugModeActive\n      lastSeen\n      sessionId\n      setupDateTime\n      isFirmwareUpdateTriggered\n      firmwareUpdateStatus\n      wifiModeStatus\n      isUSBPowerOn\n      USBFaultStatus\n      isDFIPartialFull\n      isLaserDirty\n      hopperStatus\n      scoopsSavedCount\n      isHopperRemoved\n    }\n  }\n  }\n
-128431 0x011d2060 0x011d2060 1110 1111 1.__TEXT.__const ascii       mutation updateUserSettingsV2($value: UpdateUserSettingsV2Input!) {\n      updateUserSettingsV2(input: $value) {\n          user {\n              settingsV2 {\n                  LR4Notifications {\n                    allRobotUsage\n                    drawerFull\n                    lowLitter\n                    petInactivity\n                    cleanCycleComplete\n                    cleanCycleInterrupted\n                    catDetectedInDrawer\n                    hopperEnabled\n                    firmwareUpdateSuccessful\n                    allErrors\n                  }\n                  LR3Notifications {\n                    allRobotUsage\n                    drawerFull\n                    cleanCycleComplete\n                    cleanCycleInterrupted\n                    allErrors\n                  }\n                  FR1Notifications {\n                    allRobotUsage\n                    mealDispensed\n                    snackDispensed\n                    levelLow\n                    allErrors\n                  }\n              }\n          }\n          statusCode\n          body\n      }\n    }\n
-130609 0x011f4410 0x011f4410 123  124  1.__TEXT.__const ascii       mutation AddPet($value: AddPetInput!) {\n      addPet(input: $value) {\n        petId\n        s3ImageURL\n      }\n    }\n
-131897 0x01208400 0x01208400 267  268  1.__TEXT.__const ascii        mutation updateUser($id: ID!, $email: AWSEmail!, $firstName: String!, $lastName: String!) {\n      updateUser(input: {id: $id, email: $email, firstName: $firstName, lastName: $lastName}) {\n        id\n        firstName\n        lastName\n        email\n      }\n    }\n
-134454 0x01231740 0x01231740 129  130  1.__TEXT.__const ascii       mutation DeleteRobot($id: Int!) {\n      delete_feeder_unit(where: {id: {_eq: $id}}) {\n        affected_rows\n      }\n    }\n  2
-136524 0x0124da60 0x0124da60 134  135  1.__TEXT.__const ascii       mutation addUser($value: AddUserInput!) {\n      addUser(input: $value){\n        user {\n          userId\n        }\n      }\n    }\n
-138592 0x0126b650 0x0126b650 86   87   1.__TEXT.__const ascii       mutation DeletePet($petId: String!) {\n      deletePet(input: {petId: $petId})\n  }\n
-141710 0x01297da0 0x01297da0 127  128  1.__TEXT.__const ascii       mutation litterRobot4MultiStateSync($userId: String!) {\n      litterRobot4MultiStateSync(input: {userId: $userId})\n    }\n
-147242 0x012e4430 0x012e4430 123  124  1.__TEXT.__const ascii     mutation DeleteLR4($serial: String!){\n    deleteLitterRobot4(input: {serial: $serial}) {\n     body\n     statusCode\n  }\n}\n
-148030 0x012f1870 0x012f1870 245  246  1.__TEXT.__const ascii       mutation sendLitterRobot4Command($serial: String!, $command: String!, $value: String, $commandSource: String) {\n      sendLitterRobot4Command(input: {serial: $serial, command: $command, value: $value, commandSource: $commandSource})\n    }\n
-151792 0x0132f340 0x0132f340 163  164  1.__TEXT.__const ascii   mutation TriggerUpdateBySerial($serialNumber: String!) {\n  triggerRobotUpdateBySerial(serialNumber: $serialNumber) {\n    success\n    message\n    serialNumber\n  }\n}
-152572 0x0133b280 0x0133b280 167  168  1.__TEXT.__const ascii       mutation litterRobot4StateUpdate($serial: String!, $name: String!) {\n      updateLitterRobot4(input: {serial: $serial, name: $name}){\n        name\n      }\n    }\n
-157423 0x01388fd0 0x01388fd0 195  196  1.__TEXT.__const ascii       mutation UpdateFeederState($serial: String!, $state: jsonb) {\n      update_feeder_unit_state(where: {serial: {_eq: $serial}}, _append: {info: $state}) {\n        affected_rows\n      }\n    }\n
+
+#### Toggle Hopper
+
+```graphql
+mutation ToggleHopper($serial: String!, $isRemoved: Boolean!) {
+  toggleHopper(serial: $serial, isRemoved: $isRemoved) {
+    success
+  }
+}
+```
+
+#### Reset Scoops Counter
+
+```graphql
+mutation ResetScoopsSavedCounter($serial: String!) {
+  resetScoopsSavedCounter(serial: $serial) {
+    userId
+    robotCount
+    robots {
+      unitId
+      name
+      serial
+      userId
+      espFirmware
+      picFirmwareVersion
+      picFirmwareVersionHex
+      laserBoardFirmwareVersion
+      laserBoardFirmwareVersionHex
+      wifiRssi
+      unitPowerType
+      catWeight
+      unitTimezone
+      unitTime
+      cleanCycleWaitTime
+      isKeypadLockout
+      nightLightMode
+      nightLightBrightness
+      isPanelSleepMode
+      panelBrightnessHigh
+      panelBrightnessLow
+      smartWeightEnabled
+      panelSleepTime
+      panelWakeTime
+      displayCode
+      weekdaySleepModeEnabled {
+        Sunday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Monday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Tuesday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Wednesday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Thursday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Friday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+        Saturday {
+          sleepTime
+          wakeTime
+          isEnabled
+        }
+      }
+      litterLevelPercentage
+      litterLevelState
+      unitPowerStatus
+      sleepStatus
+      robotStatus
+      globeMotorFaultStatus
+      pinchStatus
+      catDetect
+      isBonnetRemoved
+      isNightLightLEDOn
+      odometerPowerCycles
+      odometerCleanCycles
+      odometerEmptyCycles
+      odometerFilterCycles
+      isDFIResetPending
+      DFINumberOfCycles
+      DFILevelPercent
+      isDFIFull
+      DFIFullCounter
+      DFITriggerCount
+      litterLevel
+      DFILevelMM
+      isCatDetectPending
+      globeMotorRetractFaultStatus
+      robotCycleStatus
+      robotCycleState
+      weightSensor
+      isOnline
+      isOnboarded
+      isProvisioned
+      isDebugModeActive
+      lastSeen
+      sessionId
+      setupDateTime
+      isFirmwareUpdateTriggered
+      firmwareUpdateStatus
+      wifiModeStatus
+      isUSBPowerOn
+      USBFaultStatus
+      isDFIPartialFull
+      isLaserDirty
+      hopperStatus
+      scoopsSavedCount
+      isHopperRemoved
+    }
+  }
+}
+```
+
+### Robot Management
+
+#### Register Robot
+
+```graphql
+mutation RegisterLR4($value: LR4RegisterRobotInput!) {
+  registerLitterRobot4(input: $value) {
+    body
+    statusCode
+  }
+}
+```
+
+#### Update Robot State
+
+```graphql
+mutation LitterRobot4StateUpdate($value: LR4UpdateLitterRobotInput!) {
+  updateLitterRobot4(input: $value) {
+    surfaceType
+  }
+}
+```
+
+#### Update Robot Name
+
+```graphql
+mutation UpdateLR4Name($serial: String!, $name: String!) {
+  updateLitterRobot4(input: { serial: $serial, name: $name }) {
+    name
+  }
+}
+```
+
+#### Delete Robot
+
+```graphql
+mutation DeleteLR4($serial: String!) {
+  deleteLitterRobot4(input: { serial: $serial }) {
+    body
+    statusCode
+  }
+}
+```
+
+#### Trigger Firmware Update
+
+```graphql
+mutation TriggerUpdateBySerial($serialNumber: String!) {
+  triggerRobotUpdateBySerial(serialNumber: $serialNumber) {
+    success
+    message
+    serialNumber
+  }
+}
+```
+
+#### Sync Robot State
+
+```graphql
+mutation LitterRobot4MultiStateSync($userId: String!) {
+  litterRobot4MultiStateSync(input: { userId: $userId })
+}
+```
+
+### User Settings
+
+#### Update User Settings
+
+```graphql
+mutation UpdateUserSettings($value: UpdateUserSettingsInput!) {
+  updateUserSettings(input: $value) {
+    user {
+      useMetric
+      settings {
+        LR4Notifications {
+          all_notifications
+          CCC_notifications
+          CSI_notifications
+          DFI_notifications
+          fault_notifications
+          CSF_notifications
+          PD_notifications
+          OTF_notifications
+          DHF_notifications
+          BR_notifications
+          MTF_notifications
+          MID_notifications
+          general_notifications
+          offline_notifications
+          LF_notifications
+          LL_notifications
+          HPE_notifications
+        }
+        LR3Notifications {
+          BR_notifications
+          CCC_notifications
+          CSF_notifications
+          CSI_notifications
+          DFI_notifications
+          DHF_notifications
+          OTF_notifications
+          PD_notifications
+          all_notifications
+          fault_notifications
+          general_notifications
+          offline_notifications
+        }
+        FR1Notifications {
+          chuteFullExt
+          defectiveSensor
+          dispenseFailed
+          levelLow
+          mealDispensed
+          motorFault
+          snackDispensed
+          snackRejected
+          all
+        }
+      }
+    }
+    statusCode
+    body
+  }
+}
+```
+
+#### Update User Settings V2
+
+```graphql
+mutation UpdateUserSettingsV2($value: UpdateUserSettingsV2Input!) {
+  updateUserSettingsV2(input: $value) {
+    user {
+      settingsV2 {
+        LR4Notifications {
+          allRobotUsage
+          drawerFull
+          lowLitter
+          petInactivity
+          cleanCycleComplete
+          cleanCycleInterrupted
+          catDetectedInDrawer
+          hopperEnabled
+          firmwareUpdateSuccessful
+          allErrors
+        }
+        LR3Notifications {
+          allRobotUsage
+          drawerFull
+          cleanCycleComplete
+          cleanCycleInterrupted
+          allErrors
+        }
+        FR1Notifications {
+          allRobotUsage
+          mealDispensed
+          snackDispensed
+          levelLow
+          allErrors
+        }
+      }
+    }
+    statusCode
+    body
+  }
+}
+```
+
+#### Set User Functional Settings
+
+```graphql
+mutation SetUserFunctionalSettings($userId: String, $autoUpdateFeature: FeatureFlagOptions) {
+  setUserFunctionalSettings(
+    userFunctionalSettingsInput: { userId: $userId, autoUpdateFeature: $autoUpdateFeature }
+  ) {
+    autoUpdateFeature
+    userId
+  }
+}
+```
+
+### User Management
+
+#### Create User
+
+```graphql
+mutation CreateUser(
+  $email: AWSEmail!
+  $firstName: String!
+  $lastName: String!
+  $password: String!
+  $extensionAttributes: ExtensionAttributes
+) {
+  createUser(
+    input: {
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      password: $password
+      extensionAttributes: $extensionAttributes
+    }
+  ) {
+    id
+    firstName
+    lastName
+    email
+  }
+}
+```
+
+#### Update User
+
+```graphql
+mutation UpdateUser($id: ID!, $email: AWSEmail!, $firstName: String!, $lastName: String!) {
+  updateUser(input: { id: $id, email: $email, firstName: $firstName, lastName: $lastName }) {
+    id
+    firstName
+    lastName
+    email
+  }
+}
+```
+
+#### Add User
+
+```graphql
+mutation AddUser($value: AddUserInput!) {
+  addUser(input: $value) {
+    user {
+      userId
+    }
+  }
+}
+```
+
+### Pet Management
+
+#### Add Pet
+
+```graphql
+mutation AddPet($value: AddPetInput!) {
+  addPet(input: $value) {
+    petId
+    s3ImageURL
+  }
+}
+```
+
+#### Update Pet
+
+```graphql
+mutation UpdatePet($value: UpdatePetInput!) {
+  updatePet(input: $value) {
+    petId
+  }
+}
+```
+
+#### Delete Pet
+
+```graphql
+mutation DeletePet($petId: String!) {
+  deletePet(input: { petId: $petId })
+}
+```
+
+### Subscription Management
+
+#### Activate W+ Subscription
+
+```graphql
+mutation ActivateWPlusSubscription($input: ActivateWPlusSubscriptionInput!) {
+  activateWPlusSubscription(input: $input) {
+    success
+    result_code
+    message
+  }
+}
+```
+
+## App Configuration
+
+```json
+{
+  "UserAgent": "aws-amplify-cli/2.0",
+  "Version": "1.0",
+  "auth": {
+    "plugins": {
+      "awsCognitoAuthPlugin": {
+        "CognitoUserPool": {
+          "Default": {
+            "PoolId": "us-east-1_rjhNnZVAm",
+            "AppClientId": "4552ujeu3aic90nf8qn53levmn",
+            "Region": "us-east-1"
+          }
+        },
+        "Auth": {
+          "Default": {
+            "authenticationFlowType": "USER_PASSWORD_AUTH"
+          }
+        }
+      }
+    }
+  },
+  "api": {
+    "plugins": {
+      "awsAPIPlugin": {
+        "LR4-appsync-robots": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://lr4.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AWS_LAMBDA"
+        },
+        "notifications-appsync-users": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://notifications.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AWS_LAMBDA"
+        },
+        "popup-messaging-service-api": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://scjk7s4xlng3ledgl5gtiobbbe.appsync-api.us-east-1.amazonaws.com/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AMAZON_COGNITO_USER_POOLS"
+        },
+        "PetProfile-prod-Api": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://pet-profile.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AWS_LAMBDA"
+        },
+        "ota-service-appsync-api": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://otaupdate.prod.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AWS_LAMBDA"
+        },
+        "account-management-service-prod-api": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://account-mgmt.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AMAZON_COGNITO_USER_POOLS"
+        },
+        "account-management-service-prod-apiKey": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://account-mgmt.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "API_KEY",
+          "apiKey": "da2-5ru2q54lnffpdiq6ihw4lno6si"
+        },
+        "pet-insights": {
+          "endpointType": "GraphQL",
+          "endpoint": "https://insight-engine.prod.iothings.site/graphql",
+          "region": "us-east-1",
+          "authorizationType": "AMAZON_COGNITO_USER_POOLS"
+        }
+      }
+    }
+  }
+}
 ```
