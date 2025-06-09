@@ -163,8 +163,8 @@ export class LitterRobot4Client {
     }
 
     const decoded: JwtPayload = jwt.decode(this.idToken || '') as JwtPayload;
+    this.log.debug('idToken', this.idToken);
     this.log.debug('Decoded idToken', JSON.stringify(decoded, null, 2));
-    // get cognito:username from token
     this.userId = decoded?.['cognito:username'];
   }
 
@@ -261,21 +261,6 @@ export class LitterRobot4Client {
     return this.runMutation(mutation, { serial, command: 'CLEAN' });
   }
 
-  public async resetWasteDrawerGauge(serial: string): Promise<void> {
-    const mutation = `
-        mutation ResetScoopsSavedCounter($serial: String!) {
-            resetScoopsSavedCounter(serial: $serial) {
-                userId
-                robotCount
-                robots {
-                    scoopsSavedCount
-                }
-            }
-        }
-    `;
-    return this.runMutation(mutation, { serial });
-  }
-
   public async toggleHopper(serial: string, isRemoved: boolean): Promise<void> {
     const mutation = `
         mutation ToggleHopper($serial: String!, $isRemoved: Boolean!) {
@@ -285,38 +270,5 @@ export class LitterRobot4Client {
         }
     `;
     return this.runMutation(mutation, { serial, isRemoved });
-  }
-
-  public async updateRobotName(serial: string, name: string): Promise<void> {
-    const mutation = `
-        mutation UpdateLR4Name($serial: String!, $name: String!) {
-            updateLitterRobot4(input: {serial: $serial, name: $name}) {
-                name
-            }
-        }
-    `;
-    return this.runMutation(mutation, { serial, name });
-  }
-
-  public async triggerFirmwareUpdate(serial: string): Promise<void> {
-    const mutation = `
-        mutation TriggerUpdateBySerial($serialNumber: String!) {
-            triggerRobotUpdateBySerial(serialNumber: $serialNumber) {
-                success
-                message
-                serialNumber
-            }
-        }
-    `;
-    return this.runMutation(mutation, { serialNumber: serial });
-  }
-
-  public async syncRobotState(userId: string): Promise<void> {
-    const mutation = `
-        mutation LitterRobot4MultiStateSync($userId: String!) {
-            litterRobot4MultiStateSync(input: {userId: $userId})
-        }
-    `;
-    return this.runMutation(mutation, { userId });
   }
 }

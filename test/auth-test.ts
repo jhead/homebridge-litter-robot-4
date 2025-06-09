@@ -1,4 +1,4 @@
-import { LitterRobotConnect } from '../src/litter-robot-connect';
+import { LitterRobotConnect } from '../src/api';
 import { Logging } from 'homebridge';
 
 // Create a logger function that implements the Logging interface
@@ -53,23 +53,19 @@ async function main() {
   try {
     const connect = new LitterRobotConnect({ username, password }, logger);
 
-    // Attempt to authenticate
-    logger.info('Attempting to authenticate...');
-    await connect['auth'](); // Using private method for testing
-
-    // If we get here, authentication was successful
-    logger.info('Authentication successful!');
-
     // Try to sync robots to verify full functionality
     logger.info('Attempting to sync robots...');
-    await connect['sync']({} as any); // Using private method for testing
+    await connect.sync({} as any); // Using empty platform object for testing
 
     // Check discovered devices
     const devices = connect.getDevices();
     if (devices && devices.size > 0) {
       logger.info(`Discovered ${devices.size} robot(s).`);
       devices.forEach((deviceInfo, id) => {
-        logger.info(`Robot #${id}:`, deviceInfo.name);
+        logger.info(`Robot #${id}:`, {
+          name: deviceInfo.name,
+          serial: deviceInfo.serial,
+        });
       });
     } else {
       logger.warn('No devices found.');
@@ -77,12 +73,12 @@ async function main() {
 
     logger.info('Test completed successfully!');
   } catch (error) {
-    logger.error('Test failed:', error);
+    logger.error('Test failed:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
 
 main().catch((error) => {
-  console.error('Unhandled error:', error);
+  console.error('Unhandled error:', error instanceof Error ? error.message : String(error));
   process.exit(1);
 });
