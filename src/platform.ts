@@ -6,7 +6,7 @@ import {
   PlatformConfig,
   Service,
 } from 'homebridge';
-import { LitterRobotConnect } from './litter-robot-connect';
+import { LitterRobotConnect } from './api';
 import { LitterRobotDevice } from './device';
 
 export class LitterRobotPlatform implements DynamicPlatformPlugin {
@@ -86,11 +86,9 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
   public addAccessory(device: LitterRobotDevice): void {
     const uuid = this.api.hap.uuid.generate(device.id);
 
-    // Check if accessory already exists
     let accessory = this.accessories.get(uuid);
 
     if (accessory) {
-      // Update existing accessory
       this.log.debug(`Updating existing accessory: ${device.name} (${device.id})`);
       accessory.displayName = device.name;
       accessory.context.device = {
@@ -99,24 +97,19 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
         serial: device.serial,
       };
     } else {
-      // Create new accessory
       this.log.info(`Adding new accessory: ${device.name} (${device.id})`);
       accessory = new this.api.platformAccessory(device.name, uuid);
 
-      // Store only the necessary device information in the context
       accessory.context.device = {
         id: device.id,
         name: device.name,
         serial: device.serial,
       };
 
-      // Add services only for new accessories
       device.setFilterService(accessory.addService(this.api.hap.Service.FilterMaintenance));
-      device.setSwitchService(accessory.addService(this.api.hap.Service.Switch));
       device.setNightlightService(accessory.addService(this.api.hap.Service.Lightbulb));
       device.setWeightService(accessory.addService(this.api.hap.Service.TemperatureSensor));
 
-      // Create occupancy sensors with unique subtypes
       const catPresenceSensor = new this.api.hap.Service.OccupancySensor(
         'Cat Presence',
         'CatPresence'
@@ -126,11 +119,9 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       device.setOccupancyService(catPresenceSensor);
       device.setTrayService(trayFullSensor);
 
-      // Add weight sensor service
       const weightSensor = new this.api.hap.Service.TemperatureSensor('Cat Weight', 'CatWeight');
       device.setWeightService(weightSensor);
 
-      // Register the new accessory
       this.api.registerPlatformAccessories(
         LitterRobotPlatform.PLUGIN_NAME,
         LitterRobotPlatform.PLATFORM_NAME,
@@ -138,7 +129,6 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       );
     }
 
-    // Update the accessories map
     this.accessories.set(uuid, accessory);
   }
 

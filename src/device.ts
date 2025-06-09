@@ -1,25 +1,26 @@
 import { Service, Characteristic, CharacteristicValue, Logger } from 'homebridge';
 import { LitterRobotPlatform } from './platform';
-import { LitterRobotConnect } from './litter-robot-connect';
-import { LitterRobot4 } from './types';
+import { LitterRobot4Client } from './api/litterRobot4Client';
+import { LitterRobot4 } from './api/types';
 
 export class LitterRobotDevice {
-  private readonly connect: LitterRobotConnect;
+  private readonly client: LitterRobot4Client;
   private readonly platform: LitterRobotPlatform;
+
   public readonly id: string;
   public readonly name: string;
   public readonly serial: string;
+
   private details: LitterRobot4;
   private filterService?: Service;
-  private switchService?: Service;
   private nightlightService?: Service;
   private occupancyService?: Service;
   private trayService?: Service;
   private weightService?: Service;
 
-  constructor(connect: LitterRobotConnect, platform: LitterRobotPlatform, details: LitterRobot4) {
-    if (!connect) {
-      throw new Error('LitterRobotConnect instance is required');
+  constructor(client: LitterRobot4Client, platform: LitterRobotPlatform, details: LitterRobot4) {
+    if (!client) {
+      throw new Error('LitterRobot4Client instance is required');
     }
     if (!platform) {
       throw new Error('LitterRobotPlatform instance is required');
@@ -37,7 +38,7 @@ export class LitterRobotDevice {
       throw new Error('Robot serial is required');
     }
 
-    this.connect = connect;
+    this.client = client;
     this.platform = platform;
     this.id = details.unitId;
     this.name = details.name;
@@ -76,15 +77,6 @@ export class LitterRobotDevice {
       this.filterService.updateCharacteristic(
         this.platform.api.hap.Characteristic.FilterChangeIndication,
         filterChange
-      );
-    }
-
-    if (this.switchService) {
-      const filterLife = this.getFilterLife();
-      this.platform.log.debug(`Updating switch service: filterLife=${filterLife}`);
-      this.switchService.updateCharacteristic(
-        this.platform.api.hap.Characteristic.On,
-        filterLife < 100.0
       );
     }
 
@@ -151,32 +143,6 @@ export class LitterRobotDevice {
       .on('get', async (callback) => {
         this.platform.log.info('Filter change state requested');
         callback(null, this.getFilterChange());
-      });
-  }
-
-  public setSwitchService(service: Service): void {
-    this.switchService = service;
-    this.switchService
-      .getCharacteristic(this.platform.api.hap.Characteristic.On)
-      .on('get', async (callback) => {
-        this.platform.log.info('Reset switch state requested');
-        callback(null, this.getFilterLife() < 100.0);
-      })
-      .on('set', async (value: CharacteristicValue, callback) => {
-        this.platform.log.info('Reset switch state changed');
-        let err = null;
-        const power = this.getPower();
-        if (!power || this.getFilterLife() === 100.0) {
-          // Gauge cannot be reset when powered off or at 0% capacity
-          err = new Error('Waste level gauge cannot be reset at this time!');
-        } else {
-          try {
-            await this.resetGauge(value as boolean);
-          } catch (e) {
-            err = e;
-          }
-        }
-        callback(err as Error | null);
       });
   }
 
@@ -268,15 +234,6 @@ export class LitterRobotDevice {
       });
   }
 
-  public async sync(): Promise<void> {
-    const robot = await this.connect.getRobot(this.serial);
-    if (robot) {
-      this.updateDetails(robot);
-    } else {
-      this.platform.log.warn(`Failed to sync robot ${this.name} (${this.serial})`);
-    }
-  }
-
   public getPower(): boolean {
     const value = this.details.isOnline && this.details.unitPowerStatus !== 'OFF';
     this.platform.log.debug(`getPower for ${this.name}:`, {
@@ -288,8 +245,7 @@ export class LitterRobotDevice {
   }
 
   public async setPower(value: boolean): Promise<void> {
-    this.platform.log.info(`Setting power for ${this.name} to ${value}`);
-    return await this.connect.setPower(this.serial, value);
+    await this.client.setPower(this.serial, value);
   }
 
   public getNightlight(): boolean {
@@ -302,8 +258,7 @@ export class LitterRobotDevice {
   }
 
   public async setNightlight(value: boolean): Promise<void> {
-    this.platform.log.info(`Setting nightlight for ${this.name} to ${value}`);
-    return await this.connect.setNightLight(this.serial, value);
+    await this.client.setNightLight(this.serial, value);
   }
 
   public getOccupancy(): boolean {
@@ -352,16 +307,7 @@ export class LitterRobotDevice {
   }
 
   public async runCycle(): Promise<void> {
-    this.platform.log.info(`Starting cleaning cycle for ${this.name}`);
-    return await this.connect.startCleaning(this.serial);
-  }
-
-  public async resetGauge(value: boolean): Promise<void> {
-    this.platform.log.info(`Resetting waste drawer gauge for ${this.name}`);
-    if (value) {
-      await this.connect.resetWasteDrawerGauge(this.serial);
-    }
-    this.switchService?.updateCharacteristic(this.platform.api.hap.Characteristic.On, false);
+    await this.client.startCleaning(this.serial);
   }
 
   public getCatWeight(): number {
@@ -371,15 +317,5 @@ export class LitterRobotDevice {
       result: value,
     });
     return value;
-  }
-
-  private getCurrentAirPurifierState(): CharacteristicValue {
-    if (!this.getPower()) {
-      return this.platform.api.hap.Characteristic.CurrentAirPurifierState.INACTIVE;
-    }
-    if (this.getMotion()) {
-      return this.platform.api.hap.Characteristic.CurrentAirPurifierState.PURIFYING_AIR;
-    }
-    return this.platform.api.hap.Characteristic.CurrentAirPurifierState.IDLE;
   }
 }

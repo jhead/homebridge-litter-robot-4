@@ -1,22 +1,3 @@
-// Define the type for sleep mode settings
-export type SleepModeSettings = {
-  sleepTime: number;
-  wakeTime: number;
-  isEnabled: boolean;
-};
-
-// Define the type for weekday sleep mode
-export type WeekdaySleepMode = {
-  Sunday: SleepModeSettings;
-  Monday: SleepModeSettings;
-  Tuesday: SleepModeSettings;
-  Wednesday: SleepModeSettings;
-  Thursday: SleepModeSettings;
-  Friday: SleepModeSettings;
-  Saturday: SleepModeSettings;
-};
-
-// Define the main robot type
 export type LitterRobot4 = {
   name: string;
   serial: string;
@@ -62,7 +43,6 @@ export type LitterRobot4 = {
   scoopsSavedCount: number;
   litterLevelPercentage: number;
   litterLevelState: string;
-  weekdaySleepModeEnabled: WeekdaySleepMode;
 };
 
 export interface RobotData {
